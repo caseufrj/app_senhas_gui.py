@@ -59,8 +59,9 @@ def abrir_pasta_do_arquivo(caminho):
         pass
 
 
+
 # === GUI ===
-import FreeSimpleGUI as sg   # << trocar para FreeSimpleGUI
+import FreeSimpleGUI as sg  # << usar FreeSimpleGUI
 
 def set_theme_safe(name="SystemDefault"):
     try:
@@ -69,9 +70,11 @@ def set_theme_safe(name="SystemDefault"):
         if hasattr(sg, "ChangeLookAndFeel") and callable(getattr(sg, "ChangeLookAndFeel")):
             sg.ChangeLookAndFeel(name); return
     except Exception:
-        pass  # segue sem tema global se a API não existir
+        pass
+    # Sem API de tema → segue sem tema global
 
 set_theme_safe("SystemDefault")
+
 
 layout = [
     [sg.Text("Gerador de Senhas (5 caracteres)", font=("Segoe UI", 12, "bold"))],

@@ -13,6 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: List files (debug)
+        run: |
+          dir
+          echo -----
+          if exist requirements.txt (type requirements.txt) else (echo requirements.txt NAO ENCONTRADO)
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -24,12 +30,17 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
+      - name: Show PySimpleGUI version
+        run: |
+          python -c "import PySimpleGUI as sg; import pkgutil; import sys; print('PySimpleGUI version:', getattr(sg,'version', 'unknown')); print('module:', sg.__file__)"
+
       - name: Build
         run: |
-          pyinstaller --onefile --noconsole --name GeradorDeSenhas5 app_senhas_gui.py
+          pyinstaller --onefile --noconsole --name GeradorDeSenhas5 senha/senha.py
+          # ↑ ajuste o caminho do script conforme sua estrutura atual
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: GeradorDeSenhas5
-          path: dist/GeradorDeSenhas5.exe
+          path: senha/dist/GeradorDeSenhas5.exe

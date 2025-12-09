@@ -58,24 +58,20 @@ def abrir_pasta_do_arquivo(caminho):
     except Exception:
         pass
 
+
 # === GUI ===
-# IMPORTE O SUBMÓDULO DIRETAMENTE
-import PySimpleGUI.PySimpleGUI as sg
+import FreeSimpleGUI as sg   # << trocar para FreeSimpleGUI
 
 def set_theme_safe(name="SystemDefault"):
-    """Aplica tema se a API existir; caso contrário, segue sem tema global."""
     try:
         if hasattr(sg, "theme") and callable(getattr(sg, "theme")):
-            sg.theme(name)
-            return
+            sg.theme(name); return
         if hasattr(sg, "ChangeLookAndFeel") and callable(getattr(sg, "ChangeLookAndFeel")):
-            sg.ChangeLookAndFeel(name)
-            return
+            sg.ChangeLookAndFeel(name); return
     except Exception:
-        pass
-    # Sem API de tema disponível: seguir sem aplicar tema global
+        pass  # segue sem tema global se a API não existir
 
-set_theme_safe("SystemDefault")  # ou teste "DarkBlue3"
+set_theme_safe("SystemDefault")
 
 layout = [
     [sg.Text("Gerador de Senhas (5 caracteres)", font=("Segoe UI", 12, "bold"))],

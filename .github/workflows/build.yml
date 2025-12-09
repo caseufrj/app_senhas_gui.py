@@ -9,15 +9,22 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: List files (debug)
+      # Lista arquivos e mostra o requirements.txt (PowerShell)
+      - name: List files (debug - PowerShell)
         run: |
-          dir
-          echo -----
-          if exist requirements.txt (type requirements.txt) else (echo requirements.txt NAO ENCONTRADO)
+          Get-ChildItem -Recurse
+          Write-Host '-----'
+          if (Test-Path requirements.txt) {
+            Write-Host 'requirements.txt encontrado:'
+            Get-Content requirements.txt
+          } else {
+            Write-Host 'requirements.txt NAO ENCONTRADO'
+          }
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -32,12 +39,15 @@ jobs:
 
       - name: Show PySimpleGUI version
         run: |
-          python -c "import PySimpleGUI as sg; import pkgutil; import sys; print('PySimpleGUI version:', getattr(sg,'version', 'unknown')); print('module:', sg.__file__)"
+          python - << 'PY'
+          import PySimpleGUI as sg
+          print('PySimpleGUI version:', getattr(sg, 'version', 'unknown'))
+          print('module file:', getattr(sg, '__file__', 'unknown'))
+          PY
 
       - name: Build
         run: |
           pyinstaller --onefile --noconsole --name GeradorDeSenhas5 senha/senha.py
-          # ↑ ajuste o caminho do script conforme sua estrutura atual
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

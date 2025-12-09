@@ -62,20 +62,29 @@ def abrir_pasta_do_arquivo(caminho):
 
 # === GUI ===
 
+
 import PySimpleGUI as sg
 
 def set_theme_safe(name="SystemDefault"):
-    # Usa o que estiver disponível na versão instalada
-    if hasattr(sg, "theme"):                 # versões 4.x e algumas 5.x
-        sg.theme(name)
-    elif hasattr(sg, "ChangeLookAndFeel"):   # versões antigas
-        sg.ChangeLookAndFeel(name)
-    else:
-        # Se nenhuma API de tema existir, aplica opções básicas
-        sg.set_options(font=("Segoe UI", 10))
+    """
+    Aplica tema se a API existir na versão de PySimpleGUI instalada.
+    Em versões antigas, usa ChangeLookAndFeel; se nenhum método existir, segue sem tema.
+    """
+    try:
+        # Tenta usar a API moderna (v4 e algumas v5)
+        if hasattr(sg, "theme") and callable(getattr(sg, "theme")):
+            sg.theme(name)
+            return
+        # Fallback para versões antigas
+        if hasattr(sg, "ChangeLookAndFeel") and callable(getattr(sg, "ChangeLookAndFeel")):
+            sg.ChangeLookAndFeel(name)
+            return
+    except Exception:
+        # Se falhar, apenas não aplica tema (layout já define fontes específicas)
+        pass
+    # Sem API de tema disponível: seguir sem alterações globais
+    # (Como seu layout já define fonts nos elementos, a UI ficará consistente)
 
-# CHAME AQUI antes de montar o layout:
-set_theme_safe("SystemDefault")
 
 
 layout = [

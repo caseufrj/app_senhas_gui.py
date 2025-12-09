@@ -47,13 +47,13 @@ jobs:
           Write-Host "----- pip show PySimpleGUI -----"
           python -m pip show PySimpleGUI
 
-      - name: Mostrar versão do PySimpleGUI
+      - name: Mostrar versão do PySimpleGUI (submódulo)
         run: |
-          python -c "import PySimpleGUI as sg, sys; print('PySimpleGUI version:', getattr(sg,'version','unknown')); print('module file:', getattr(sg,'__file__','unknown')); print('python:', sys.version)"
+          python -c "import importlib, sys; sg = importlib.import_module('PySimpleGUI.PySimpleGUI'); print('PySimpleGUI module file:', getattr(sg,'__file__','unknown')); print('python:', sys.version)"
 
       - name: Build EXE (arquivo na raiz)
         run: |
-          pyinstaller --onefile --noconsole --name GeradorDeSenhas5 app_senhas_gui.py
+          pyinstaller --onefile --noconsole --hidden-import PySimpleGUI.PySimpleGUI --name GeradorDeSenhas5 app_senhas_gui.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

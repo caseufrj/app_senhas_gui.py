@@ -4,9 +4,8 @@ import csv
 import string
 import secrets
 from datetime import datetime
-import PySimpleGUI as sg
 
-# === Configuração ===
+# === Funções de senha (mantidas do seu script) ===
 LENGTH = 5
 CHARSET = string.digits + string.ascii_uppercase + string.ascii_lowercase
 sysrand = secrets.SystemRandom()
@@ -32,7 +31,7 @@ def gerar_lista(qtd, unique=False, require_all=False):
     if not unique:
         return [gerar_senha(require_all=require_all) for _ in range(qtd)]
     senhas = set()
-    # Para grandes quantidades, poderia usar um limite de tentativas, mas com 62^5 combinações é tranquilo.
+    # 62^5 combinações ~916M → pedir até 10k únicas é seguro
     while len(senhas) < qtd:
         senhas.add(gerar_senha(require_all=require_all))
     return list(senhas)
@@ -46,7 +45,7 @@ def salvar_csv(caminho, senhas):
             w.writerow([s])
 
 def abrir_pasta_do_arquivo(caminho):
-    """Tenta abrir a pasta no sistema operacional."""
+    """Tenta abrir a pasta do arquivo no sistema operacional."""
     try:
         pasta = os.path.dirname(os.path.abspath(caminho))
         if os.name == 'nt':  # Windows
@@ -60,12 +59,16 @@ def abrir_pasta_do_arquivo(caminho):
     except Exception:
         pass
 
-
 # === GUI ===
-
-import PySimpleGUI as sg
+# Importa explicitamente o submódulo que contém os elementos
+import importlib
+sg = importlib.import_module("PySimpleGUI.PySimpleGUI")
 
 def set_theme_safe(name="SystemDefault"):
+    """
+    Aplica tema se a API existir. Em versões antigas usa ChangeLookAndFeel;
+    se nenhum método existir, segue sem aplicar tema global.
+    """
     try:
         if hasattr(sg, "theme") and callable(getattr(sg, "theme")):
             sg.theme(name)
@@ -74,10 +77,12 @@ def set_theme_safe(name="SystemDefault"):
             sg.ChangeLookAndFeel(name)
             return
     except Exception:
+        # Se der alguma exceção, apenas segue sem tema
         pass
-    # Sem API de tema: seguir sem aplicar tema global
+    # Sem API de tema disponível: seguir sem aplicar tema global
 
-set_theme_safe("SystemDefault")
+# Chame antes de montar o layout
+set_theme_safe("SystemDefault")  # você pode testar "DarkBlue3" ou outro se quiser
 
 layout = [
     [sg.Text("Gerador de Senhas (5 caracteres)", font=("Segoe UI", 12, "bold"))],
@@ -106,6 +111,7 @@ while True:
         break
 
     if event == "-GERAR-":
+        # Valida quantidade
         try:
             qtd = int(str(values["-QTD-"]).strip())
         except (ValueError, TypeError):
@@ -119,6 +125,7 @@ while True:
             sg.popup_error(f"Erro ao gerar: {e}")
             continue
 
+        # Exibe
         window["-OUT-"].update("")
         window["-OUT-"].print(f"Gerado: {len(senhas_atuais)} senhas.\n")
         for s in senhas_atuais:
@@ -159,4 +166,3 @@ while True:
         ultimo_arquivo = None
 
 window.close()
-

@@ -60,32 +60,24 @@ def abrir_pasta_do_arquivo(caminho):
     except Exception:
         pass
 
-# === GUI ===
 
+# === GUI ===
 
 import PySimpleGUI as sg
 
 def set_theme_safe(name="SystemDefault"):
-    """
-    Aplica tema se a API existir na versão de PySimpleGUI instalada.
-    Em versões antigas, usa ChangeLookAndFeel; se nenhum método existir, segue sem tema.
-    """
     try:
-        # Tenta usar a API moderna (v4 e algumas v5)
         if hasattr(sg, "theme") and callable(getattr(sg, "theme")):
             sg.theme(name)
             return
-        # Fallback para versões antigas
         if hasattr(sg, "ChangeLookAndFeel") and callable(getattr(sg, "ChangeLookAndFeel")):
             sg.ChangeLookAndFeel(name)
             return
     except Exception:
-        # Se falhar, apenas não aplica tema (layout já define fontes específicas)
         pass
-    # Sem API de tema disponível: seguir sem alterações globais
-    # (Como seu layout já define fonts nos elementos, a UI ficará consistente)
+    # Sem API de tema: seguir sem aplicar tema global
 
-
+set_theme_safe("SystemDefault")
 
 layout = [
     [sg.Text("Gerador de Senhas (5 caracteres)", font=("Segoe UI", 12, "bold"))],
@@ -100,7 +92,7 @@ layout = [
      sg.Button("Abrir pasta", key="-ABRIR-"),
      sg.Button("Limpar", key="-LIMPAR-"),
      sg.Button("Sair")],
-    [sg.Text("Resultado:"),],
+    [sg.Text("Resultado:")],
     [sg.Multiline("", size=(60,15), key="-OUT-", disabled=True, autoscroll=True, font=("Consolas", 10))]
 ]
 
@@ -114,7 +106,6 @@ while True:
         break
 
     if event == "-GERAR-":
-        # Valida quantidade
         try:
             qtd = int(str(values["-QTD-"]).strip())
         except (ValueError, TypeError):
@@ -128,7 +119,6 @@ while True:
             sg.popup_error(f"Erro ao gerar: {e}")
             continue
 
-        # Exibe
         window["-OUT-"].update("")
         window["-OUT-"].print(f"Gerado: {len(senhas_atuais)} senhas.\n")
         for s in senhas_atuais:
@@ -169,3 +159,4 @@ while True:
         ultimo_arquivo = None
 
 window.close()
+

@@ -61,7 +61,22 @@ def abrir_pasta_do_arquivo(caminho):
         pass
 
 # === GUI ===
-sg.theme("SystemDefault")
+
+import PySimpleGUI as sg
+
+def set_theme_safe(name="SystemDefault"):
+    # Usa o que estiver disponível na versão instalada
+    if hasattr(sg, "theme"):                 # versões 4.x e algumas 5.x
+        sg.theme(name)
+    elif hasattr(sg, "ChangeLookAndFeel"):   # versões antigas
+        sg.ChangeLookAndFeel(name)
+    else:
+        # Se nenhuma API de tema existir, aplica opções básicas
+        sg.set_options(font=("Segoe UI", 10))
+
+# CHAME AQUI antes de montar o layout:
+set_theme_safe("SystemDefault")
+
 
 layout = [
     [sg.Text("Gerador de Senhas (5 caracteres)", font=("Segoe UI", 12, "bold"))],

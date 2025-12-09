@@ -1,1 +1,1 @@
-FreeSimpleGUI==4.60.5
+FreeSimpleGUI==5.2.0.post1

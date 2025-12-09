@@ -5,7 +5,7 @@ import string
 import secrets
 from datetime import datetime
 
-# === Funções de senha (mantidas do seu script) ===
+# === Funções de senha ===
 LENGTH = 5
 CHARSET = string.digits + string.ascii_uppercase + string.ascii_lowercase
 sysrand = secrets.SystemRandom()
@@ -31,7 +31,6 @@ def gerar_lista(qtd, unique=False, require_all=False):
     if not unique:
         return [gerar_senha(require_all=require_all) for _ in range(qtd)]
     senhas = set()
-    # 62^5 combinações ~916M → pedir até 10k únicas é seguro
     while len(senhas) < qtd:
         senhas.add(gerar_senha(require_all=require_all))
     return list(senhas)
@@ -50,7 +49,7 @@ def abrir_pasta_do_arquivo(caminho):
         pasta = os.path.dirname(os.path.abspath(caminho))
         if os.name == 'nt':  # Windows
             os.startfile(pasta)
-        elif os.name == 'posix':  # Linux/Mac
+        elif os.name == 'posix':
             import subprocess, sys
             if sys.platform == 'darwin':
                 subprocess.run(['open', pasta])
@@ -60,15 +59,11 @@ def abrir_pasta_do_arquivo(caminho):
         pass
 
 # === GUI ===
-# Importa explicitamente o submódulo que contém os elementos
-import importlib
-sg = importlib.import_module("PySimpleGUI.PySimpleGUI")
+# IMPORTE O SUBMÓDULO DIRETAMENTE
+import PySimpleGUI.PySimpleGUI as sg
 
 def set_theme_safe(name="SystemDefault"):
-    """
-    Aplica tema se a API existir. Em versões antigas usa ChangeLookAndFeel;
-    se nenhum método existir, segue sem aplicar tema global.
-    """
+    """Aplica tema se a API existir; caso contrário, segue sem tema global."""
     try:
         if hasattr(sg, "theme") and callable(getattr(sg, "theme")):
             sg.theme(name)
@@ -77,12 +72,10 @@ def set_theme_safe(name="SystemDefault"):
             sg.ChangeLookAndFeel(name)
             return
     except Exception:
-        # Se der alguma exceção, apenas segue sem tema
         pass
     # Sem API de tema disponível: seguir sem aplicar tema global
 
-# Chame antes de montar o layout
-set_theme_safe("SystemDefault")  # você pode testar "DarkBlue3" ou outro se quiser
+set_theme_safe("SystemDefault")  # ou teste "DarkBlue3"
 
 layout = [
     [sg.Text("Gerador de Senhas (5 caracteres)", font=("Segoe UI", 12, "bold"))],
